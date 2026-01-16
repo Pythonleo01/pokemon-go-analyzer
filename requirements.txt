@@ -1,4 +1,6 @@
-﻿flask
+flask
+pillow
 pytesseract
 opencv-python-headless
-pillow
+numpy
+gunicorn
