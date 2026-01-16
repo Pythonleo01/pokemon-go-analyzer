@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokémon GO Account Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0f172a;
+            color: #e5e7eb;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .upload-box {
+            border: 2px dashed #38bdf8;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .upload-box:hover {
+            background: #1e293b;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #38bdf8;
+            color: #020617;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        pre {
+            background: #020617;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Pokémon GO Screenshot Analyzer</h1>
+<p style="text-align:center;">Upload up to 60 screenshots and get a ready-to-copy description</p>
+
+<div class="upload-box" onclick="fileInput.click()">
+    Tap to select screenshots
+    <input type="file" id="fileInput" multiple accept="image/*" hidden>
+</div>
+
+<div class="actions">
+    <button onclick="analyze()">Analyze</button>
+    <button onclick="copyResult()">Copy Description</button>
+</div>
+
+<pre id="output">Waiting for screenshots...</pre>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const output = document.getElementById("output");
+
+async function analyze() {
+    if (!fileInput.files.length) {
+        alert("Please select screenshots first");
+        return;
+    }
+
+    if (fileInput.files.length > 60) {
+        alert("Maximum 60 images allowed");
+        return;
+    }
+
+    const formData = new FormData();
+    for (const file of fileInput.files) {
+        formData.append("images", file);
+    }
+
+    output.textContent = "Processing screenshots... Please wait.";
+
+    try {
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            output.textContent = "Error: " + data.error;
+            return;
+        }
+
+        output.textContent =
+            "Images processed: " + data.images_processed + "\n" +
+            "Duplicates skipped: " + data.duplicates_skipped + "\n\n" +
+            data.generated_description;
+
+    } catch (err) {
+        output.textContent = "Server error. Please try again.";
+    }
+}
+
+function copyResult() {
+    if (!output.textContent.trim()) {
+        alert("Nothing to copy");
+        return;
+    }
+
+    navigator.clipboard.writeText(output.textContent)
+        .then(() => alert("Description copied!"))
+        .catch(() => alert("Copy failed"));
+}
+</script>
+
+</body>
+</html>
