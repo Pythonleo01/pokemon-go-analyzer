@@ -1,0 +1,6 @@
+﻿flask
+pytesseract
+opencv-python-headless
+pillow
+imagehash
+gunicorn
