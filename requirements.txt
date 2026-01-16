@@ -2,4 +2,3 @@
 pytesseract
 opencv-python-headless
 pillow
-imagehash
