@@ -10,4 +10,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD gunicorn -b 0.0.0.0:$PORT description:app
+CMD Fix PORT env expansion
